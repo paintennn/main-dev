@@ -15,6 +15,7 @@ import {
 import { useStateValue } from "./Context/StateProvider";
 import { actionType } from "./Context/reducer";
 import { motion, AnimatePresence } from "framer-motion";
+import Favorites from "./components/Favorites";
 
 const App = () => {
   const firebaseAuth = getAuth(app);
@@ -78,6 +79,7 @@ const App = () => {
           <Route path="/*" element={<Home />} />
           <Route path="/dashboard/*" element={<Dashboard />} />
           <Route path="/userProfile" element={<UserProfile />} />
+          <Route path="/favorites" element={<Favorites />} />
         </Routes>
 
         {isSongPlaying && (

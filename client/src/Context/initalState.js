@@ -12,4 +12,5 @@ export const initialState = {
   song: null,
   isSongPlaying: false,
   miniPlayer: false,
+  favoriteSongs: [],
 };

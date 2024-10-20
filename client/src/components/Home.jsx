@@ -1,3 +1,4 @@
+// src/components/Home.js
 import React, { useEffect, useState } from "react";
 import { getAllSongs } from "../api";
 import { actionType } from "../Context/reducer";
@@ -5,6 +6,7 @@ import { useStateValue } from "../Context/StateProvider";
 import Filter from "./Filter";
 import Header from "./Header";
 import SearchBar from "./SearchBar";
+import SongCard from "./SongCard"; // Nhập SongCard
 import { motion } from "framer-motion";
 
 const Home = () => {
@@ -98,65 +100,16 @@ const Home = () => {
 
       <div className="w-full h-auto flex justify-center">
         <div className="flex flex-wrap justify-between gap-4 p-4 max-w-[1200px]">
-          <HomeSongContainer
-            musics={filteredSongs ? filteredSongs : allSongs}
-          />
+          {filteredSongs
+            ? filteredSongs.map((data, index) => (
+                <SongCard key={data._id} data={data} /> // Sử dụng SongCard
+              ))
+            : allSongs.map((data, index) => (
+                <SongCard key={data._id} data={data} /> // Sử dụng SongCard
+              ))}
         </div>
       </div>
     </div>
-  );
-};
-
-export const HomeSongContainer = ({ musics }) => {
-  const [{ isSongPlaying, song }, dispatch] = useStateValue();
-
-  const addSongToContext = (selectedSong) => {
-    if (!isSongPlaying) {
-      dispatch({
-        type: actionType.SET_SONG_PLAYING,
-        isSongPlaying: true,
-      });
-    }
-    if (selectedSong && song?._id !== selectedSong._id) {
-      dispatch({
-        type: actionType.SET_SONG,
-        song: selectedSong._id,
-      });
-    }
-  };
-
-  return (
-    <>
-      {musics?.map((data, index) => (
-        <motion.div
-          key={data._id}
-          whileTap={{ scale: 0.8 }}
-          initial={{ opacity: 0, translateX: -50 }}
-          animate={{ opacity: 1, translateX: 0 }}
-          transition={{ duration: 0.3, delay: index * 0.1 }}
-          className="relative w-1/6 min-w-[160px] h-64 cursor-pointer hover:shadow-xl hover:bg-card bg-gray-100 shadow-md rounded-lg flex flex-col items-start"
-          onClick={() => addSongToContext(data)}
-        >
-          <div className="w-full h-40 rounded-lg drop-shadow-lg relative overflow-hidden">
-            <motion.img
-              whileHover={{ scale: 1.05 }}
-              src={data.imageURL}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          <div className="flex flex-col items-start justify-start text-left w-full mt-2 px-2">
-            <p className="text-base text-headingColor font-semibold">
-              {data.name.length > 25
-                ? `${data.name.slice(0, 25)}...`
-                : data.name}
-            </p>
-            <span className="block text-sm text-gray-400">{data.artist}</span>
-          </div>
-        </motion.div>
-      ))}
-    </>
   );
 };
 

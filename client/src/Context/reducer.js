@@ -12,6 +12,7 @@ export const actionType = {
   SET_SONG: "SET_SONG",
   SET_SONG_PLAYING: "SET_SONG_PLAYING",
   SET_MINI_PLAYER: "SET_MINI_PLAYER",
+  SET_FAVORITE_SONGS: "SET_FAVORITE_SONGS",
 };
 
 const reducer = (state, action) => {
@@ -94,6 +95,11 @@ const reducer = (state, action) => {
       return {
         ...state,
         miniPlayer: action.miniPlayer,
+      };
+    case actionType.SET_FAVORITE_SONGS:
+      return {
+        ...state,
+        favoriteSongs: action.favoriteSongs,
       };
 
     default:

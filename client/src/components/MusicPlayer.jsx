@@ -8,12 +8,15 @@ import "react-h5-audio-player/lib/styles.css";
 import { actionType } from "../Context/reducer";
 import { getAllSongs } from "../api";
 import { RiPlayListFill } from "react-icons/ri";
+import { FaHeart } from "react-icons/fa"; // Nhập biểu tượng trái tim
 
 const MusicPlayer = () => {
   const [isPlayList, setIsPlayList] = useState(false);
-  const [{ allSongs, song, isSongPlaying, miniPlayer }, dispatch] =
-    useStateValue();
-  const isMounted = useRef(true); // Sử dụng useRef để theo dõi trạng thái mounted
+  const [
+    { allSongs, song, isSongPlaying, miniPlayer, favoriteSongs },
+    dispatch,
+  ] = useStateValue();
+  const isMounted = useRef(true);
 
   const closeMusicPlayer = () => {
     if (isSongPlaying) {
@@ -50,13 +53,24 @@ const MusicPlayer = () => {
     });
   };
 
+  const toggleFavorite = () => {
+    const isFavorite = favoriteSongs.includes(song);
+    const updatedFavorites = isFavorite
+      ? favoriteSongs.filter((id) => id !== song) // Xóa nếu đã yêu thích
+      : [...favoriteSongs, song]; // Thêm nếu chưa yêu thích
+
+    dispatch({
+      type: actionType.SET_FAVORITE_SONGS,
+      favoriteSongs: updatedFavorites,
+    });
+  };
+
   useEffect(() => {
-    isMounted.current = true; // Thiết lập trạng thái mounted
+    isMounted.current = true;
 
     if (!allSongs.length) {
       getAllSongs().then((data) => {
         if (isMounted.current) {
-          // Chỉ cập nhật nếu component còn mounted
           dispatch({
             type: actionType.SET_ALL_SONGS,
             allSongs: data.data,
@@ -65,9 +79,8 @@ const MusicPlayer = () => {
       });
     }
 
-    // Cleanup function
     return () => {
-      isMounted.current = false; // Thiết lập trạng thái unmounted khi component gỡ bỏ
+      isMounted.current = false;
     };
   }, [allSongs, dispatch]);
 
@@ -85,11 +98,9 @@ const MusicPlayer = () => {
         />
         <div className="flex items-start flex-col">
           <p className="text-xl text-headingColor font-semibold">
-            {`${
-              allSongs.find((s) => s._id === song)?.name.length > 20
-                ? allSongs.find((s) => s._id === song)?.name.slice(0, 20)
-                : allSongs.find((s) => s._id === song)?.name
-            }`}{" "}
+            {allSongs.find((s) => s._id === song)?.name.length > 20
+              ? allSongs.find((s) => s._id === song)?.name.slice(0, 20)
+              : allSongs.find((s) => s._id === song)?.name}{" "}
             <span className="text-base">
               ({allSongs.find((s) => s._id === song)?.album})
             </span>
@@ -105,6 +116,13 @@ const MusicPlayer = () => {
             onClick={() => setIsPlayList(!isPlayList)}
           >
             <RiPlayListFill className="text-textColor hover:text-headingColor text-3xl cursor-pointer" />
+          </motion.i>
+          <motion.i whileTap={{ scale: 0.8 }} onClick={toggleFavorite}>
+            <FaHeart
+              className={
+                favoriteSongs.includes(song) ? "text-red-500" : "text-textColor"
+              }
+            />
           </motion.i>
         </div>
         <div className="flex-1">
@@ -141,8 +159,8 @@ const MusicPlayer = () => {
               src={allSongs.find((s) => s._id === song)?.imageURL}
               className="z-50 w-32 h-32 rounded-full object-cover cursor-pointer"
               alt=""
-              animate={{ rotate: 360 }} // Thêm hiệu ứng xoay tròn
-              transition={{ repeat: Infinity, duration: 10, ease: "linear" }} // Lặp lại vô hạn và điều chỉnh tốc độ
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
             />
           </div>
         </motion.div>
@@ -152,9 +170,9 @@ const MusicPlayer = () => {
 };
 
 // Phần PlayListCard không thay đổi
-
+// Phần PlayListCard
 export const PlayListCard = () => {
-  const [{ allSongs, song }, dispatch] = useStateValue();
+  const [{ allSongs, song, favoriteSongs }, dispatch] = useStateValue();
 
   const setCurrentPlaySong = (songIndex) => {
     const currentSong = allSongs[songIndex];
@@ -166,6 +184,18 @@ export const PlayListCard = () => {
     }
   };
 
+  const toggleFavorite = (songId) => {
+    const isFavorite = favoriteSongs.includes(songId);
+    const updatedFavorites = isFavorite
+      ? favoriteSongs.filter((id) => id !== songId) // Xóa nếu đã yêu thích
+      : [...favoriteSongs, songId]; // Thêm nếu chưa yêu thích
+
+    dispatch({
+      type: actionType.SET_FAVORITE_SONGS,
+      favoriteSongs: updatedFavorites,
+    });
+  };
+
   return (
     <div className="absolute left-4 bottom-24 gap-2 py-2 w-350 max-w-[350px] h-510 max-h-[510px] flex flex-col overflow-y-scroll scrollbar-thin rounded-md shadow-md bg-primary">
       {allSongs.length > 0 ? (
@@ -175,17 +205,15 @@ export const PlayListCard = () => {
             initial={{ opacity: 0, translateX: -50 }}
             animate={{ opacity: 1, translateX: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
-            className={`group w-full p-4 hover:bg-card flex gap-3 items-center cursor-pointer ${
+            className={`w-full p-4 hover:bg-card flex gap-3 items-center cursor-pointer ${
               music._id === song ? "bg-card" : "bg-transparent"
             }`}
             onClick={() => setCurrentPlaySong(index)}
           >
             <IoMusicalNote className="text-textColor group-hover:text-headingColor text-2xl cursor-pointer" />
-            <div className="flex items-start flex-col">
+            <div className="flex items-start flex-col flex-grow">
               <p className="text-lg text-headingColor font-semibold">
-                {`${
-                  music.name.length > 20 ? music.name.slice(0, 20) : music.name
-                }`}{" "}
+                {music.name.length > 20 ? music.name.slice(0, 20) : music.name}{" "}
                 <span className="text-base">({music.album})</span>
               </p>
               <p className="text-textColor">
@@ -195,6 +223,21 @@ export const PlayListCard = () => {
                 </span>
               </p>
             </div>
+            <motion.i
+              whileTap={{ scale: 0.8 }}
+              onClick={(e) => {
+                e.stopPropagation(); // Ngăn chặn sự kiện click lan ra ngoài
+                toggleFavorite(music._id);
+              }}
+            >
+              <FaHeart
+                className={
+                  favoriteSongs.includes(music._id)
+                    ? "text-red-500"
+                    : "text-textColor"
+                }
+              />
+            </motion.i>
           </motion.div>
         ))
       ) : (

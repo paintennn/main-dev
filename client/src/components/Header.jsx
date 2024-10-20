@@ -76,9 +76,13 @@ const Header = () => {
                 Profile
               </p>
             </NavLink>
-            <p className="text-base text-textColor hover:font-semibold duration-150 transition-all ease-in-out">
-              My Favourites
-            </p>
+
+            <NavLink to={"/favorites"}>
+              <p className="text-base text-textColor hover:font-semibold duration-150 transition-all ease-in-out">
+                My Favourites
+              </p>
+            </NavLink>
+
             <hr />
             {user?.user.role === "admin" && (
               <>
