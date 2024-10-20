@@ -34,59 +34,51 @@ const Home = () => {
   }, [allSongs, dispatch]);
 
   useEffect(() => {
-    if (searchTerm.length > 0) {
-      const filtered = allSongs.filter(
-        (data) =>
-          data.artist.toLowerCase().includes(searchTerm) ||
-          data.language.toLowerCase().includes(searchTerm) ||
-          data.name.toLowerCase().includes(searchTerm) ||
-          data.artist.includes(artistFilter)
-      );
-      setFilteredSongs(filtered);
-    } else {
-      setFilteredSongs(null);
-    }
-  }, [searchTerm, allSongs, artistFilter]);
+    if (allSongs) {
+      let filtered = allSongs;
 
-  useEffect(() => {
-    const filtered = allSongs?.filter((data) => data.artist === artistFilter);
-    if (filtered) {
-      setFilteredSongs(filtered);
-    } else {
-      setFilteredSongs(null);
-    }
-  }, [artistFilter, allSongs]);
+      // Lọc theo searchTerm
+      if (searchTerm.length > 0) {
+        filtered = filtered.filter(
+          (data) =>
+            data.artist.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            data.language.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            data.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
 
-  useEffect(() => {
-    const filtered = allSongs?.filter(
-      (data) => data.category.toLowerCase() === filterTerm
-    );
-    if (filtered) {
-      setFilteredSongs(filtered);
-    } else {
-      setFilteredSongs(null);
-    }
-  }, [filterTerm, allSongs]);
+      // Lọc theo artistFilter
+      if (artistFilter) {
+        filtered = filtered.filter((data) => data.artist === artistFilter);
+      }
 
-  useEffect(() => {
-    const filtered = allSongs?.filter((data) => data.album === albumFilter);
-    if (filtered) {
-      setFilteredSongs(filtered);
-    } else {
-      setFilteredSongs(null);
-    }
-  }, [albumFilter, allSongs]);
+      // Lọc theo filterTerm
+      if (filterTerm) {
+        filtered = filtered.filter(
+          (data) => data.category.toLowerCase() === filterTerm.toLowerCase()
+        );
+      }
 
-  useEffect(() => {
-    const filtered = allSongs?.filter(
-      (data) => data.language === languageFilter
-    );
-    if (filtered) {
-      setFilteredSongs(filtered);
-    } else {
-      setFilteredSongs(null);
+      // Lọc theo albumFilter
+      if (albumFilter) {
+        filtered = filtered.filter((data) => data.album === albumFilter);
+      }
+
+      // Lọc theo languageFilter
+      if (languageFilter) {
+        filtered = filtered.filter((data) => data.language === languageFilter);
+      }
+
+      setFilteredSongs(filtered.length > 0 ? filtered : null);
     }
-  }, [languageFilter, allSongs]);
+  }, [
+    searchTerm,
+    artistFilter,
+    filterTerm,
+    albumFilter,
+    languageFilter,
+    allSongs,
+  ]);
 
   return (
     <div className="w-full h-auto flex flex-col items-center justify-center bg-primary">
