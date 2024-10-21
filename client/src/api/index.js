@@ -138,3 +138,35 @@ export const updateSong = async (id, songData) => {
     throw error;
   }
 };
+
+export const addFavouriteSong = async (userId, songId) => {
+  try {
+    const res = await axios.put(
+      `${baseURL}api/users/favourites/${userId}`,
+      {},
+      {
+        params: { songId },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error adding favourite song:", error);
+    return null;
+  }
+};
+
+export const removeFavouriteSong = async (userId, songId) => {
+  try {
+    const res = await axios.put(
+      `${baseURL}api/users/removeFavourites/${userId}`,
+      {},
+      {
+        params: { songId },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error removing favourite song:", error);
+    return null;
+  }
+};

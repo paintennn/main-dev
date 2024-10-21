@@ -100,13 +100,17 @@ const Home = () => {
 
       <div className="w-full h-auto flex justify-center">
         <div className="flex flex-wrap justify-between gap-4 p-4 max-w-[1200px]">
-          {filteredSongs
-            ? filteredSongs.map((data, index) => (
-                <SongCard key={data._id} data={data} /> // Sử dụng SongCard
-              ))
-            : allSongs.map((data, index) => (
-                <SongCard key={data._id} data={data} /> // Sử dụng SongCard
-              ))}
+          {filteredSongs && filteredSongs.length > 0 ? (
+            filteredSongs.map((data, index) => (
+              <SongCard key={data._id} data={data} /> // Sử dụng SongCard
+            ))
+          ) : allSongs && allSongs.length > 0 ? (
+            allSongs.map((data, index) => (
+              <SongCard key={data._id} data={data} /> // Sử dụng SongCard
+            ))
+          ) : (
+            <p className="text-textColor">No songs found</p>
+          )}
         </div>
       </div>
     </div>

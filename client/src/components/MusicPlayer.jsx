@@ -6,14 +6,14 @@ import { motion } from "framer-motion";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import { actionType } from "../Context/reducer";
-import { getAllSongs } from "../api";
+import { getAllSongs, addFavouriteSong, removeFavouriteSong } from "../api"; // Nhập hàm gọi API
 import { RiPlayListFill } from "react-icons/ri";
 import { FaHeart } from "react-icons/fa"; // Nhập biểu tượng trái tim
 
 const MusicPlayer = () => {
   const [isPlayList, setIsPlayList] = useState(false);
   const [
-    { allSongs, song, isSongPlaying, miniPlayer, favoriteSongs },
+    { allSongs, song, isSongPlaying, miniPlayer, favoriteSongs, user }, // Thêm userId vào trạng thái
     dispatch,
   ] = useStateValue();
   const isMounted = useRef(true);
@@ -53,11 +53,18 @@ const MusicPlayer = () => {
     });
   };
 
-  const toggleFavorite = () => {
+  const toggleFavorite = async () => {
     const isFavorite = favoriteSongs.includes(song);
     const updatedFavorites = isFavorite
       ? favoriteSongs.filter((id) => id !== song) // Xóa nếu đã yêu thích
       : [...favoriteSongs, song]; // Thêm nếu chưa yêu thích
+
+    // Gọi API tương ứng
+    if (isFavorite) {
+      await removeFavouriteSong(user.user._id, song); // Gọi API xóa bài hát yêu thích
+    } else {
+      await addFavouriteSong(user.user._id, song); // Gọi API thêm bài hát yêu thích
+    }
 
     dispatch({
       type: actionType.SET_FAVORITE_SONGS,
@@ -169,10 +176,9 @@ const MusicPlayer = () => {
   );
 };
 
-// Phần PlayListCard không thay đổi
 // Phần PlayListCard
 export const PlayListCard = () => {
-  const [{ allSongs, song, favoriteSongs }, dispatch] = useStateValue();
+  const [{ allSongs, song, favoriteSongs, userId }, dispatch] = useStateValue();
 
   const setCurrentPlaySong = (songIndex) => {
     const currentSong = allSongs[songIndex];
@@ -184,11 +190,18 @@ export const PlayListCard = () => {
     }
   };
 
-  const toggleFavorite = (songId) => {
+  const toggleFavorite = async (songId) => {
     const isFavorite = favoriteSongs.includes(songId);
     const updatedFavorites = isFavorite
       ? favoriteSongs.filter((id) => id !== songId) // Xóa nếu đã yêu thích
       : [...favoriteSongs, songId]; // Thêm nếu chưa yêu thích
+
+    // Gọi API tương ứng
+    if (isFavorite) {
+      await removeFavouriteSong(userId, songId); // Gọi API xóa bài hát yêu thích
+    } else {
+      await addFavouriteSong(userId, songId); // Gọi API thêm bài hát yêu thích
+    }
 
     dispatch({
       type: actionType.SET_FAVORITE_SONGS,
@@ -210,23 +223,17 @@ export const PlayListCard = () => {
             }`}
             onClick={() => setCurrentPlaySong(index)}
           >
-            <IoMusicalNote className="text-textColor group-hover:text-headingColor text-2xl cursor-pointer" />
-            <div className="flex items-start flex-col flex-grow">
-              <p className="text-lg text-headingColor font-semibold">
-                {music.name.length > 20 ? music.name.slice(0, 20) : music.name}{" "}
-                <span className="text-base">({music.album})</span>
+            <IoMusicalNote className="text-textColor group-hover:text-headingColor text-2xl" />
+            <div className="flex flex-col">
+              <p className="text-headingColor text-base font-semibold">
+                {music.name}
               </p>
-              <p className="text-textColor">
-                {music.artist}{" "}
-                <span className="text-sm text-textColor font-semibold">
-                  ({music.category})
-                </span>
-              </p>
+              <p className="text-textColor text-sm">{music.artist}</p>
             </div>
             <motion.i
               whileTap={{ scale: 0.8 }}
               onClick={(e) => {
-                e.stopPropagation(); // Ngăn chặn sự kiện click lan ra ngoài
+                e.stopPropagation();
                 toggleFavorite(music._id);
               }}
             >
@@ -241,7 +248,7 @@ export const PlayListCard = () => {
           </motion.div>
         ))
       ) : (
-        <p>No songs available</p>
+        <p className="text-center">No songs available</p>
       )}
     </div>
   );
