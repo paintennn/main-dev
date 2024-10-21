@@ -39,6 +39,9 @@ router.post("/save", async (req, res) => {
     artist: req.body.artist,
     language: req.body.language,
     category: req.body.category,
+    releaseDate: req.body.releaseDate, // Thêm trường ngày phát hành
+    provider: req.body.provider, // Thêm trường nhà cung cấp
+    lyrics: req.body.lyrics, // Thêm trường lyrics
   });
   try {
     const savedSong = await newSong.save();
@@ -65,6 +68,9 @@ router.put("/update/:updateId", async (req, res) => {
         artist: req.body.artist,
         language: req.body.language,
         category: req.body.category,
+        // releaseDate: req.body.releaseDate,
+        // provider: req.body.provider,
+        // lyrics: req.body.lyrics,
       },
       options
     );

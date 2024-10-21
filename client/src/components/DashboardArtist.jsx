@@ -19,17 +19,23 @@ const DashboardArtist = () => {
 
   const handleDeleteArtist = useCallback(
     (artistId) => {
-      deleteArtist(artistId)
-        .then(() => {
-          const updatedArtists = artists.filter(
-            (artist) => artist._id !== artistId
-          );
-          dispatch({ type: actionType.SET_ARTISTS, artists: updatedArtists });
-        })
-        .catch((error) => {
-          console.error("Error deleting artist:", error);
-          alert("Failed to delete artist. Please try again.");
-        });
+      if (
+        window.confirm(
+          "Are you sure you want to delete this artist? This will also delete all related songs."
+        )
+      ) {
+        deleteArtist(artistId)
+          .then(() => {
+            const updatedArtists = artists.filter(
+              (artist) => artist._id !== artistId
+            );
+            dispatch({ type: actionType.SET_ARTISTS, artists: updatedArtists });
+          })
+          .catch((error) => {
+            console.error("Error deleting artist:", error);
+            alert("Failed to delete artist. Please try again.");
+          });
+      }
     },
     [artists, dispatch]
   );

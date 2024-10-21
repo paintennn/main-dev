@@ -111,13 +111,17 @@ export const deleteSongById = async (id) => {
 
 export const deleteArtist = async (id) => {
   try {
-    const res = await axios.delete(`${baseURL}api/artists/delete/${id}`)
-    return res.data
+    const res = await axios.delete(`${baseURL}api/artists/delete/${id}`);
+    if (res.status === 200) {
+      return res.data;
+    } else {
+      throw new Error("Failed to delete artist");
+    }
   } catch (error) {
-    console.log("Error deleting artist: ", error)
-    throw error
+    console.error("Error deleting artist:", error.response ? error.response.data : error.message);
+    throw error;
   }
-}
+};
 
 export const deleteAlbum = async (id) => {
   try {
@@ -157,11 +161,10 @@ export const addFavouriteSong = async (userId, songId) => {
 
 export const removeFavouriteSong = async (userId, songId) => {
   try {
-    const res = await axios.put(
-      `${baseURL}api/users/removeFavourites/${userId}`,
-      {},
+    const res = await axios.delete(
+      `${baseURL}api/users/favourites/${userId}`,
       {
-        params: { songId },
+        data: { songId: songId },
       }
     );
     return res.data;
@@ -170,3 +173,27 @@ export const removeFavouriteSong = async (userId, songId) => {
     return null;
   }
 };
+
+export const getFavouriteSongs = async (userId) => {
+  try {
+    const res = await axios.get(`${baseURL}api/users/favourites/${userId}`);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching favourite songs:", error);
+    return null;
+  }
+};
+
+export const getSongById = async (id) => {
+  try {
+    const res = await axios.get(`${baseURL}api/songs/getOne/${id}`);
+    return res.data; // Giả sử API trả về thông tin bài hát
+  } catch (error) {
+    console.error("Error fetching song by ID:", error);
+    return null; // Hoặc bạn có thể xử lý theo cách khác
+  }
+};
+
+
+
+

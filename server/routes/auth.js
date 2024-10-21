@@ -41,6 +41,48 @@ router.put("/favourites/:userId", async (req, res) => {
     res.status(400).send({ success: false, msg: error });
   }
 });
+router.get("/favourites/:userId", async (req, res) => {
+  const filter = { _id: req.params.userId };
+
+  try {
+    const userFound = await user.findOne(filter);
+    if (!userFound) {
+      return res.status(404).send({ success: false, msg: "User not found" });
+    }
+
+    const favourites = userFound.favourites; // Lấy danh sách bài hát yêu thích
+    res.status(200).send({ success: true, data: favourites });
+  } catch (error) {
+    res.status(500).send({ success: false, msg: error.message });
+  }
+});
+
+// Xóa bài hát khỏi danh sách yêu thích của người dùng
+router.delete("/favourites/:userId", async (req, res) => {
+  const filter = { _id: req.params.userId };
+  const { songId } = req.body; // Lấy songId từ req.body
+
+  // Kiểm tra songId
+  if (!songId) {
+    return res.status(400).send({ success: false, msg: "songId is required" });
+  }
+
+  try {
+    const result = await user.updateOne(filter, {
+      $pull: { favourites: { songId: songId } }, // Sửa đây để xác định songId chính xác
+    });
+
+    if (result.modifiedCount > 0) {
+      res.status(200).send({ success: true, msg: "Song removed from favourites" });
+    } else {
+      res.status(404).send({ success: false, msg: "Song not found in favourites" });
+    }
+  } catch (error) {
+    res.status(400).send({ success: false, msg: error.message });
+  }
+});
+
+
 
 router.get("/getUsers", async (req, res) => {
   const options = {

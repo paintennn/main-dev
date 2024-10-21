@@ -6,7 +6,6 @@ const SongSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-
     imageURL: {
       type: String,
       required: true,
@@ -27,6 +26,18 @@ const SongSchema = mongoose.Schema(
       required: true,
     },
     category: {
+      type: String,
+      required: true,
+    },
+    releaseDate: {  // Ngày phát hành
+      type: Date,
+      required: true,
+    },
+    provider: {  // Nhà cung cấp
+      type: String,
+      required: true,
+    },
+    lyrics: {  // Thêm trường lyrics
       type: String,
       required: true,
     },
