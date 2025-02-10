@@ -32,7 +32,6 @@ router.put("/favourites/:userId", async (req, res) => {
   const songId = req.query;
 
   try {
-    console.log(filter, songId);
     const result = await user.updateOne(filter, {
       $push: { favourites: songId },
     });
@@ -114,7 +113,6 @@ router.get("/getUser/:userId", async (req, res) => {
 });
 
 router.put("/updateRole/:userId", async (req, res) => {
-  console.log(req.body.data.role, req.params.userId);
   const filter = { _id: req.params.userId };
   const role = req.body.data.role;
 
@@ -147,7 +145,6 @@ router.put("/removeFavourites/:userId", async (req, res) => {
   const songId = req.query;
 
   try {
-    console.log(filter, songId);
     const result = await user.updateOne(filter, {
       $pull: { favourites: songId },
     });

@@ -58,4 +58,4 @@ const SongCard = ({ data, isAdmin, onDelete }) => {
   );
 };
 
-export default memo(SongCard);
+export default memo(SongCard); // Memo hóa SongCard

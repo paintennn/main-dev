@@ -22,7 +22,6 @@ router.get("/getOne/:getOne", async (req, res) => {
   const filter = { _id: req.params.getOne };
 
   const cursor = await album.findOne(filter);
-  console.log(cursor);
   if (cursor) {
     res.status(200).send({ success: true, data: cursor });
   } else {

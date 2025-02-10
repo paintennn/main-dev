@@ -71,25 +71,28 @@ router.put("/update/:updateId", async (req, res) => {
 });
 
 router.delete("/delete/:deleteId", async (req, res) => {
-  const artistId = req.params.deleteId; // Lấy artistId từ params
+  const deleteId = req.params.deleteId;
 
   try {
-    // Xóa tất cả các bài hát liên quan đến artist
-    await song.deleteMany({ artist: artistId });
+    // Xóa tất cả bài hát của nghệ sĩ
+    await song.deleteMany({ artist: deleteId });
 
-    // Xóa artist
-    const result = await artist.deleteOne({ _id: artistId });
+    // Sau đó, xóa nghệ sĩ
+    const artistResult = await artist.deleteOne({ _id: deleteId });
 
-    if (result.deletedCount === 1) {
-      res.status(200).send({ success: true, msg: "Artist and related songs deleted successfully." });
+    if (artistResult.deletedCount === 1) {
+      res.status(200).send({ success: true, msg: "Artist and related songs deleted" });
     } else {
-      res.status(404).send({ success: false, msg: "Artist Not Found" });
+      res.status(404).send({ success: false, msg: "Artist not found" });
     }
   } catch (error) {
-    console.error("Error deleting artist:", error); // In lỗi ra console
-    res.status(500).send({ success: false, msg: "Internal Server Error" });
+    console.error("Error deleting artist and songs:", error);
+    res.status(500).send({ success: false, msg: "Error deleting artist" });
   }
 });
+
+
+
 
 
 module.exports = router;

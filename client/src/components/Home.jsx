@@ -1,13 +1,12 @@
 // src/components/Home.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getAllSongs } from "../api";
 import { actionType } from "../Context/reducer";
 import { useStateValue } from "../Context/StateProvider";
 import Filter from "./Filter";
 import Header from "./Header";
 import SearchBar from "./SearchBar";
-import SongCard from "./SongCard"; // Nhập SongCard
-import { motion } from "framer-motion";
+import SongCard from "./SongCard";
 
 const Home = () => {
   const [
@@ -22,56 +21,60 @@ const Home = () => {
     dispatch,
   ] = useStateValue();
 
-  const [filteredSongs, setFilteredSongs] = useState(null);
+  const [filteredSongs, setFilteredSongs] = useState([]);
 
+  // Fetch all songs if not already loaded
   useEffect(() => {
     if (!allSongs) {
       getAllSongs().then((data) => {
-        dispatch({
-          type: actionType.SET_ALL_SONGS,
-          allSongs: data.data,
-        });
+        if (data?.data) {
+          dispatch({
+            type: actionType.SET_ALL_SONGS,
+            allSongs: data.data,
+          });
+        }
       });
     }
   }, [allSongs, dispatch]);
 
+  // Filter songs based on the current filters
   useEffect(() => {
     if (allSongs) {
       let filtered = allSongs;
 
-      // Lọc theo searchTerm
+      // Filter by search term
       if (searchTerm.length > 0) {
         filtered = filtered.filter(
-          (data) =>
-            data.artist.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            data.language.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            data.name.toLowerCase().includes(searchTerm.toLowerCase())
+          (song) =>
+            song.artist.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            song.language.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            song.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
       }
 
-      // Lọc theo artistFilter
+      // Filter by artist
       if (artistFilter) {
-        filtered = filtered.filter((data) => data.artist === artistFilter);
+        filtered = filtered.filter((song) => song.artist === artistFilter);
       }
 
-      // Lọc theo filterTerm
+      // Filter by category (filterTerm)
       if (filterTerm) {
         filtered = filtered.filter(
-          (data) => data.category.toLowerCase() === filterTerm.toLowerCase()
+          (song) => song.category.toLowerCase() === filterTerm.toLowerCase()
         );
       }
 
-      // Lọc theo albumFilter
+      // Filter by album
       if (albumFilter) {
-        filtered = filtered.filter((data) => data.album === albumFilter);
+        filtered = filtered.filter((song) => song.album === albumFilter);
       }
 
-      // Lọc theo languageFilter
+      // Filter by language
       if (languageFilter) {
-        filtered = filtered.filter((data) => data.language === languageFilter);
+        filtered = filtered.filter((song) => song.language === languageFilter);
       }
 
-      setFilteredSongs(filtered.length > 0 ? filtered : null);
+      setFilteredSongs(filtered);
     }
   }, [
     searchTerm,
@@ -81,6 +84,21 @@ const Home = () => {
     languageFilter,
     allSongs,
   ]);
+
+  // Function to render the song cards
+  const renderSongs = useCallback(() => {
+    if (filteredSongs && filteredSongs.length > 0) {
+      return filteredSongs.map((song) => (
+        <SongCard key={song._id} data={song} />
+      ));
+    }
+
+    if (allSongs && allSongs.length > 0) {
+      return allSongs.map((song) => <SongCard key={song._id} data={song} />);
+    }
+
+    return <p className="text-textColor">No songs found</p>;
+  }, [filteredSongs, allSongs]);
 
   return (
     <div className="w-full h-auto flex flex-col items-center justify-center bg-primary">
@@ -100,17 +118,7 @@ const Home = () => {
 
       <div className="w-full h-auto flex justify-center">
         <div className="flex flex-wrap justify-between gap-4 p-4 max-w-[1200px]">
-          {filteredSongs && filteredSongs.length > 0 ? (
-            filteredSongs.map((data, index) => (
-              <SongCard key={data._id} data={data} /> // Sử dụng SongCard
-            ))
-          ) : allSongs && allSongs.length > 0 ? (
-            allSongs.map((data, index) => (
-              <SongCard key={data._id} data={data} /> // Sử dụng SongCard
-            ))
-          ) : (
-            <p className="text-textColor">No songs found</p>
-          )}
+          {renderSongs()}
         </div>
       </div>
     </div>

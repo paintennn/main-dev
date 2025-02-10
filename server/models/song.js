@@ -31,15 +31,15 @@ const SongSchema = mongoose.Schema(
     },
     releaseDate: {  // Ngày phát hành
       type: Date,
-      required: true,
+      required: false,
     },
     provider: {  // Nhà cung cấp
       type: String,
-      required: true,
+      required: false,
     },
     lyrics: {  // Thêm trường lyrics
       type: String,
-      required: true,
+      required: false,
     },
   },
   { timestamps: true }

@@ -40,10 +40,7 @@ const updateSongs = async () => {
                 "Hãy cùng nhau thưởng thức những giai điệu tuyệt vời.";
 
             await song.save(); // Lưu bài hát đã được cập nhật
-            console.log(`Đã cập nhật bài hát: ${song.name}`);
         }
-
-        console.log("Đã cập nhật tất cả bài hát.");
     } catch (error) {
         console.error("Lỗi khi cập nhật bài hát:", error);
     } finally {

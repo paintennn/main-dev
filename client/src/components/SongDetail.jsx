@@ -11,7 +11,6 @@ const SongDetail = () => {
     const fetchSongDetail = async () => {
       try {
         const response = await getSongById(id); // Gọi API để lấy thông tin bài hát
-        console.log(response); // Kiểm tra dữ liệu trả về
         if (response && response.success) {
           setSong(response.data); // Cập nhật state với data từ API
         } else {
